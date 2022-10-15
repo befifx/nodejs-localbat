@@ -17,6 +17,9 @@ npx ts-node index.ts
 ```PowerShell
 # powershellの場合
 Invoke-WebRequest -Method Post -Body @{path="aiueo"} http://localhost:3000/execbat
+
+# nodejsの場合
+npx ts-node sample_post.ts
 ```
 
 ## 参考にしたページ
