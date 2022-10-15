@@ -19,33 +19,27 @@ app.post('/execbat', (req: express.Request, res: express.Response) => {
   console.log(JSON.stringify(req.body));
 
   // iniファイル修正
-  modifyIni(req.body['path']);
-
-  // バッチ実行
-  execBat();
-
-  // 返却値
-  res.send('OK');
+  modifyIni(req.body['path']).then(
+    (data) => {
+      // 修正に成功した場合、バッチを実行する
+      execBat();
+      res.send('OK');
+    },
+    (err) => {
+      // 修正に失敗した場合
+      console.log('ini modify error');
+      res.send('NG');
+    }
+  );
 });
 
 // ini書き換え
 const modifyIni = (path: string) => {
   const iniPath = './bat/sample.ini';
-
   const props = PropertiesReader(iniPath);
-
-  console.log(props.get('hoge.fuga'));
   props.set('hoge.fuga', path);
 
-  props.save(iniPath).then(
-    (data) => {
-      console.log('ini modify success');
-    },
-    (err) => {
-      console.log('ini modify error');
-      console.log(JSON.stringify(err));
-    }
-  );
+  return props.save(iniPath);
 };
 
 // バッチ実行
@@ -53,6 +47,7 @@ const execBat = () => {
   const appPath = '.\\bat\\sample.bat';
   const argument = '';
   const cmd = appPath + ' ' + argument;
+
   require('child_process').execSync(cmd, (err: string, stdout: string, stderr: string) => {
     if (err) console.log('err:', err);
     if (stdout) console.log('stdout:', stdout);
